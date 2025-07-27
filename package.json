@@ -1,6 +1,6 @@
 {
-  "name": "lmstudio-mcp-server",
-  "version": "1.0.0",
+  "name": "lmstudio-mcp",
+  "version": "0.0.0-semantic-release",
   "description": "A Model Context Protocol (MCP) server for LM Studio integration",
   "main": "dist/index.js",
   "type": "module",
@@ -19,17 +19,23 @@
     "llm"
   ],
   "author": "",
-  "license": "MIT",
+  "license": "Unlicense",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "zod": "^3.23.8",
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.57.0",
+    "husky": "^9.0.0",
+    "semantic-release": "^24.2.3",
     "tsx": "^4.7.0",
     "typescript": "^5.3.0"
   },
