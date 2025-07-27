@@ -4,29 +4,18 @@
 
 ## ⚡ Quick Start with Claude Code
 
-### 1. Build This Server
+### 1. Add This Server to Claude Code
 
-First, build this MCP server project:
-
-```bash
-git clone <repository-url>
-cd lmstudio-mcp
-npm install
-npm run build
-```
-
-### 2. Add This Server to Claude Code
-
-In your project directory where you want to use LM Studio, add this MCP server:
+In your project directory where you want to use LM Studio, add this MCP server directly from GitHub:
 
 ```bash
-claude mcp add lmstudio-mcp -- node /absolute/path/to/this/lmstudio-mcp/dist/index.js
+claude mcp add lmstudio-mcp -- npx github:nyvyn/lmstudio-mcp
 ```
 
 Or if you need to set any environment variables:
 
 ```bash
-claude mcp add lmstudio-mcp -e LM_STUDIO_URL=http://localhost:1234 -- node /absolute/path/to/this/lmstudio-mcp/dist/index.js
+claude mcp add lmstudio-mcp -e LM_STUDIO_URL=http://localhost:1234 -- npx github:nyvyn/lmstudio-mcp
 ```
 
 You can verify it was added with:
@@ -35,13 +24,13 @@ You can verify it was added with:
 claude mcp list
 ```
 
-### 3. Start LM Studio
+### 2. Start LM Studio
 
 1. Launch LM Studio
 2. Load a model
 3. Start the local server (should be accessible at `http://localhost:1234`)
 
-### 4. Use in Claude Code
+### 3. Use in Claude Code
 
 Once configured, you can interact with your local LM Studio models:
 
