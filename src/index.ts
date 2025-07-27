@@ -241,9 +241,8 @@ async function main(): Promise<void> {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
-    process.stderr.write(`Server error: ${error}\n`);
-    process.exit(1);
-  });
-}
+// Start the server when run directly
+main().catch((error) => {
+  process.stderr.write(`Server error: ${error}\n`);
+  process.exit(1);
+});
