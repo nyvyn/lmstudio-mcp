@@ -3,6 +3,9 @@
   "version": "0.0.0-semantic-release",
   "description": "A Model Context Protocol (MCP) server for LM Studio integration",
   "main": "dist/index.js",
+  "bin": {
+    "lmstudio-mcp": "src/index.ts"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc",
@@ -23,7 +26,8 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "zod": "^3.23.8",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "tsx": "^4.7.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
@@ -36,7 +40,6 @@
     "eslint": "^8.57.0",
     "husky": "^9.0.0",
     "semantic-release": "^24.2.3",
-    "tsx": "^4.7.0",
     "typescript": "^5.3.0"
   },
   "engines": {

@@ -1,3 +1,4 @@
+#!/usr/bin/env tsx
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -12,22 +13,24 @@ const server = new McpServer({
 });
 
 async function makeRequest(endpoint: string, options: any = {}): Promise<any> {
+  const response = await fetch(`${LM_STUDIO_BASE_URL}${endpoint}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers
+    },
+    ...options
+  }).catch(error => {
+    throw new Error(`LM Studio API request failed: ${error instanceof Error ? error.message : String(error)}`);
+  });
+  
+  if (!response.ok) {
+    throw new Error(`LM Studio API request failed: HTTP ${response.status}: ${response.statusText}`);
+  }
+  
   try {
-    const response = await fetch(`${LM_STUDIO_BASE_URL}${endpoint}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-      },
-      ...options
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-    
     return await response.json();
   } catch (error) {
-    throw new Error(`LM Studio API request failed: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(`LM Studio API response parsing failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
