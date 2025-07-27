@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "lmstudio-mcp-server": {
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {}
+    }
+  }
+}
