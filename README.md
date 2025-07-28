@@ -6,7 +6,7 @@
 
 ### 1. Add This Server to Claude Code
 
-Add this MCP server directly from GitHub:
+In your project directory where you want to use LM Studio, add this MCP server directly from GitHub:
 
 ```bash
 claude mcp add lmstudio-mcp -- npx github:nyvyn/lmstudio-mcp
