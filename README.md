@@ -15,7 +15,7 @@ claude mcp add lmstudio-mcp -- npx github:nyvyn/lmstudio-mcp
 Or if you need to specify a custom base URL:
 
 ```bash
-claude mcp add lmstudio-mcp -- npx github:nyvyn/lmstudio-mcp --base-url http://localhost:1234/v1
+claude mcp add lmstudio-mcp -- npx github:nyvyn/lmstudio-mcp --base-url http://localhost:1234
 ```
 
 You can verify it was added with:
