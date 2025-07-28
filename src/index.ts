@@ -7,7 +7,7 @@ import fetch from "node-fetch";
 const LM_STUDIO_BASE_URL = "http://localhost:1234/v1";
 
 const server = new McpServer({
-  name: "lmstudio-mcp-server",
+  name: "lmstudio-mcp",
   version: "1.0.0",
   description: "A Model Context Protocol server for LM Studio integration"
 });
@@ -44,36 +44,6 @@ server.registerTool("echo", {
   content: [{ 
     type: "text", 
     text: `Echo: ${text}` 
-  }]
-}));
-
-server.registerTool("add", {
-  title: "Addition Tool", 
-  description: "Add two numbers together",
-  inputSchema: {
-    a: z.number().describe("First number"),
-    b: z.number().describe("Second number")
-  }
-}, async ({ a, b }: { a: number; b: number }) => ({
-  content: [{
-    type: "text",
-    text: `${a} + ${b} = ${a + b}`
-  }]
-}));
-
-server.registerTool("get_system_info", {
-  title: "System Information",
-  description: "Get basic system information",
-  inputSchema: {}
-}, async () => ({
-  content: [{
-    type: "text",
-    text: JSON.stringify({
-      platform: process.platform,
-      nodeVersion: process.version,
-      uptime: process.uptime(),
-      timestamp: new Date().toISOString()
-    }, null, 2)
   }]
 }));
 
