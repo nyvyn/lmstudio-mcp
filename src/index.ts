@@ -4,7 +4,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import fetch from "node-fetch";
 
-const LM_STUDIO_BASE_URL = process.env.LM_STUDIO_URL || "http://localhost:1234";
+const LM_STUDIO_BASE_URL = "http://localhost:1234";
 const V1 = "/v1"; // Version of the OpenAI API
 
 const server = new McpServer({
@@ -14,7 +14,12 @@ const server = new McpServer({
 });
 
 async function makeRequest(endpoint: string, options: any = {}): Promise<any> {
-  const response = await fetch(`${LM_STUDIO_BASE_URL}${V1}${endpoint}`, {
+  // Parse command line arguments
+  const args = process.argv.slice(2);
+  const baseUrlIndex = args.findIndex(arg => arg === '--base-url' || arg === '-b');
+  const baseUrlFromArgs = baseUrlIndex !== -1 && baseUrlIndex + 1 < args.length ? args[baseUrlIndex + 1] : null;
+
+  const response = await fetch(`${baseUrlFromArgs || LM_STUDIO_BASE_URL}${V1}${endpoint}`, {
     headers: {
       'Content-Type': 'application/json',
       ...options.headers
@@ -53,19 +58,25 @@ server.registerTool("lmstudio_health_check", {
   description: "Check if LM Studio API is running and accessible",
   inputSchema: {}
 }, async () => {
+  // Get base URL for display
+  const args = process.argv.slice(2);
+  const baseUrlIndex = args.findIndex(arg => arg === '--base-url' || arg === '-b');
+  const baseUrlFromArgs = baseUrlIndex !== -1 && baseUrlIndex + 1 < args.length ? args[baseUrlIndex + 1] : null;
+  const baseUrl = baseUrlFromArgs || process.env.LM_STUDIO_URL || "http://localhost:1234";
+  
   try {
     const response = await makeRequest("/models");
     return {
       content: [{
         type: "text",
-        text: `✅ LM Studio API is running and accessible\nBase URL: ${LM_STUDIO_BASE_URL}\nResponse: ${JSON.stringify(response, null, 2)}`
+        text: `✅ LM Studio API is running and accessible\nBase URL: ${baseUrl}/v1\nResponse: ${JSON.stringify(response, null, 2)}`
       }]
     };
   } catch (error) {
     return {
       content: [{
         type: "text",
-        text: `❌ LM Studio API is not accessible\nBase URL: ${LM_STUDIO_BASE_URL}\nError: ${error instanceof Error ? error.message : String(error)}`
+        text: `❌ LM Studio API is not accessible\nBase URL: ${baseUrl}/v1\nError: ${error instanceof Error ? error.message : String(error)}`
       }]
     };
   }

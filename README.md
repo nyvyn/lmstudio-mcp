@@ -12,10 +12,10 @@ In your project directory where you want to use LM Studio, add this MCP server d
 claude mcp add lmstudio-mcp -- npx github:nyvyn/lmstudio-mcp
 ```
 
-Or if you need to set any environment variables:
+Or if you need to specify a custom base URL:
 
 ```bash
-claude mcp add lmstudio-mcp -e LM_STUDIO_URL=http://localhost:1234 -- npx github:nyvyn/lmstudio-mcp
+claude mcp add lmstudio-mcp -- npx github:nyvyn/lmstudio-mcp --base-url http://localhost:1234/v1
 ```
 
 You can verify it was added with:
@@ -132,4 +132,32 @@ echo '{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVe
 
 ## 🛠️ Configuration
 
-The server connects to LM Studio at `http://localhost:1234/v1` by default. This can be modified in `src/index.ts` by changing the `LM_STUDIO_BASE_URL` constant.
+The server connects to LM Studio at `http://localhost:1234/v1` by default. You can configure the base URL in several ways:
+
+### Command Line Arguments
+```bash
+npx tsx src/index.ts --base-url http://localhost:1234/v1
+# or short form
+npx tsx src/index.ts -b http://localhost:1234/v1
+```
+
+### Environment Variable
+```bash
+export LM_STUDIO_URL=http://localhost:1234
+npx tsx src/index.ts
+```
+
+### Claude Code MCP Configuration
+Add to your Claude Code MCP configuration:
+```json
+{
+  "mcpServers": {
+    "lmstudio": {
+      "command": "npx",
+      "args": ["tsx", "./src/index.ts", "--base-url", "http://localhost:1234/v1"]
+    }
+  }
+}
+```
+
+Priority order: Command line argument > Environment variable > Default (`http://localhost:1234`)
