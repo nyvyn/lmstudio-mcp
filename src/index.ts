@@ -4,8 +4,8 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import fetch from "node-fetch";
 
-const LM_STUDIO_BASE_URL = "http://localhost:1234";
-const V1 = "/v1"; // Version of the LM Studio API
+const LM_STUDIO_BASE_URL = process.env.LM_STUDIO_URL || "http://localhost:1234/v1";
+const V1 = "/v1"; // Version of the OpenAI API
 
 const server = new McpServer({
   name: "lmstudio-mcp",
