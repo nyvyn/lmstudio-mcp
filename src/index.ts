@@ -16,7 +16,7 @@ const server = new McpServer({
 async function makeRequest(endpoint: string, options: any = {}): Promise<any> {
   // Parse command line arguments
   const args = process.argv.slice(2);
-  const baseUrlIndex = args.findIndex(arg => arg === '--base-url' || arg === '-b');
+  const baseUrlIndex = args.findIndex(arg => arg === '--base-url');
   const baseUrlFromArgs = baseUrlIndex !== -1 && baseUrlIndex + 1 < args.length ? args[baseUrlIndex + 1] : null;
 
   const response = await fetch(`${baseUrlFromArgs || LM_STUDIO_BASE_URL}${V1}${endpoint}`, {
@@ -60,7 +60,7 @@ server.registerTool("lmstudio_health_check", {
 }, async () => {
   // Get base URL for display
   const args = process.argv.slice(2);
-  const baseUrlIndex = args.findIndex(arg => arg === '--base-url' || arg === '-b');
+  const baseUrlIndex = args.findIndex(arg => arg === '--base-url');
   const baseUrlFromArgs = baseUrlIndex !== -1 && baseUrlIndex + 1 < args.length ? args[baseUrlIndex + 1] : null;
   const baseUrl = baseUrlFromArgs || process.env.LM_STUDIO_URL || "http://localhost:1234";
   
