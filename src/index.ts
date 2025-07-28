@@ -5,6 +5,7 @@ import { z } from "zod";
 import fetch from "node-fetch";
 
 const LM_STUDIO_BASE_URL = process.env.LM_STUDIO_URL || "http://localhost:1234/v1";
+const V1 = "/v1"; // Version of the OpenAI API
 
 const server = new McpServer({
   name: "lmstudio-mcp",
@@ -13,7 +14,7 @@ const server = new McpServer({
 });
 
 async function makeRequest(endpoint: string, options: any = {}): Promise<any> {
-  const response = await fetch(`${LM_STUDIO_BASE_URL}${endpoint}`, {
+  const response = await fetch(`${LM_STUDIO_BASE_URL}${V1}${endpoint}`, {
     headers: {
       'Content-Type': 'application/json',
       ...options.headers
