@@ -132,20 +132,14 @@ echo '{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVe
 
 ## 🛠️ Configuration
 
-The server connects to LM Studio at `http://localhost:1234/v1` by default. You can configure the base URL in several ways:
+The server connects to LM Studio at `http://localhost:1234` by default. You can configure a custom base URL using command line arguments:
 
 ### Command Line Arguments
 ```bash
-npx tsx src/index.ts --base-url http://localhost:1234/v1
-# or short form
-npx tsx src/index.ts -b http://localhost:1234/v1
+npx tsx src/index.ts --base-url http://localhost:1234
 ```
 
-### Environment Variable
-```bash
-export LM_STUDIO_URL=http://localhost:1234
-npx tsx src/index.ts
-```
+Note: The server automatically appends `/v1` to the base URL for API requests.
 
 ### Claude Code MCP Configuration
 Add to your Claude Code MCP configuration:
@@ -154,10 +148,17 @@ Add to your Claude Code MCP configuration:
   "mcpServers": {
     "lmstudio": {
       "command": "npx",
-      "args": ["tsx", "./src/index.ts", "--base-url", "http://localhost:1234/v1"]
+      "args": ["tsx", "./src/index.ts", "--base-url", "http://localhost:1234"]
     }
   }
 }
 ```
 
-Priority order: Command line argument > Environment variable > Default (`http://localhost:1234`)
+### Examples
+```bash
+# Connect to LM Studio on different port
+npx tsx src/index.ts --base-url http://localhost:8080
+
+# Connect to remote LM Studio instance
+npx tsx src/index.ts --base-url http://192.168.1.100:1234
+```
