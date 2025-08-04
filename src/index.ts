@@ -5,7 +5,52 @@ import { z } from "zod";
 import fetch from "node-fetch";
 
 const LM_STUDIO_BASE_URL = "http://localhost:1234";
-const V1 = "/v1"; // Version of the OpenAI API
+const V1 = "/v1";
+
+interface LMStudioModel {
+  id: string;
+  name?: string;
+  object: string;
+  created: number;
+  owned_by: string;
+}
+
+interface LMStudioModelsResponse {
+  object: string;
+  data: LMStudioModel[];
+}
+
+interface ChatMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+interface ChatCompletionChoice {
+  index: number;
+  message: ChatMessage;
+  finish_reason: string;
+}
+
+interface ChatCompletionUsage {
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_tokens: number;
+}
+
+interface ChatCompletionResponse {
+  id: string;
+  object: string;
+  created: number;
+  model: string;
+  choices: ChatCompletionChoice[];
+  usage: ChatCompletionUsage;
+}
+
+interface RequestOptions {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: string;
+}
 
 const server = new McpServer({
   name: "lmstudio-mcp",
@@ -13,8 +58,7 @@ const server = new McpServer({
   description: "A Model Context Protocol server for LM Studio integration"
 });
 
-async function makeRequest(endpoint: string, options: any = {}): Promise<any> {
-  // Parse command line arguments
+async function makeRequest<T = unknown>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const args = process.argv.slice(2);
   const baseUrlIndex = args.findIndex(arg => arg === '--base-url');
   const baseUrlFromArgs = baseUrlIndex !== -1 && baseUrlIndex + 1 < args.length ? args[baseUrlIndex + 1] : null;
@@ -25,7 +69,7 @@ async function makeRequest(endpoint: string, options: any = {}): Promise<any> {
       ...options.headers
     },
     ...options
-  }).catch(error => {
+  }).catch((error: unknown) => {
     throw new Error(`LM Studio API request failed: ${error instanceof Error ? error.message : String(error)}`);
   });
   
@@ -34,8 +78,8 @@ async function makeRequest(endpoint: string, options: any = {}): Promise<any> {
   }
   
   try {
-    return await response.json();
-  } catch (error) {
+    return await response.json() as T;
+  } catch (error: unknown) {
     throw new Error(`LM Studio API response parsing failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
@@ -59,7 +103,7 @@ server.registerTool("lmstudio_list_models", {
   inputSchema: {}
 }, async () => {
   try {
-    const response = await makeRequest("/models");
+    const response = await makeRequest<LMStudioModelsResponse>("/models");
     const models = response.data || [];
     
     if (models.length === 0) {
@@ -71,7 +115,7 @@ server.registerTool("lmstudio_list_models", {
       };
     }
     
-    const modelList = models.map((model: any, index: number) => 
+    const modelList = models.map((model: LMStudioModel, index: number) => 
       `${index + 1}. ${model.id || model.name || 'Unknown Model'}`
     ).join('\n');
     
@@ -81,7 +125,7 @@ server.registerTool("lmstudio_list_models", {
         text: `Available LM Studio Models (${models.length} total):\n\n${modelList}`
       }]
     };
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       content: [{
         type: "text",
@@ -97,13 +141,11 @@ server.registerTool("lmstudio_get_current_model", {
   inputSchema: {}
 }, async () => {
   try {
-    const response = await makeRequest("/chat/completions", {
+    const response = await makeRequest<ChatCompletionResponse>("/chat/completions", {
       method: "POST",
       body: JSON.stringify({
         model: "local-model",
         messages: [{ role: "user", content: "What model are you?" }],
-        max_tokens: 50,
-        temperature: 0.1
       })
     });
     
@@ -116,7 +158,7 @@ server.registerTool("lmstudio_get_current_model", {
         text: `Current Model: ${modelInfo}\n\nModel Response: ${message}`
       }]
     };
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       content: [{
         type: "text",
@@ -132,17 +174,13 @@ server.registerTool("lmstudio_chat_completion", {
   inputSchema: {
     prompt: z.string().describe("The user prompt/message"),
     system_prompt: z.string().optional().describe("Optional system prompt"),
-    temperature: z.number().min(0).max(2).default(0.7).describe("Temperature for randomness (0-2)"),
-    max_tokens: z.number().min(1).max(4096).default(150).describe("Maximum tokens to generate")
   }
-}, async ({ prompt, system_prompt, temperature = 0.7, max_tokens = 150 }: { 
+}, async ({ prompt, system_prompt }: {
   prompt: string; 
-  system_prompt?: string; 
-  temperature?: number; 
-  max_tokens?: number; 
+  system_prompt?: string;
 }) => {
   try {
-    const messages: any[] = [];
+    const messages: ChatMessage[] = [];
     
     if (system_prompt) {
       messages.push({ role: "system", content: system_prompt });
@@ -150,13 +188,11 @@ server.registerTool("lmstudio_chat_completion", {
     
     messages.push({ role: "user", content: prompt });
     
-    const response = await makeRequest("/chat/completions", {
+    const response = await makeRequest<ChatCompletionResponse>("/chat/completions", {
       method: "POST",
       body: JSON.stringify({
         model: "local-model",
         messages: messages,
-        temperature: temperature,
-        max_tokens: max_tokens
       })
     });
     
@@ -167,10 +203,10 @@ server.registerTool("lmstudio_chat_completion", {
     return {
       content: [{
         type: "text",
-        text: `**Model:** ${model}\n**Temperature:** ${temperature}\n**Max Tokens:** ${max_tokens}\n\n**Response:**\n${completion}\n\n**Usage:** ${JSON.stringify(usage, null, 2)}`
+        text: `**Model:** ${model}\n\n**Response:**\n${completion}\n\n**Usage:** ${JSON.stringify(usage, null, 2)}`
       }]
     };
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       content: [{
         type: "text",
@@ -188,14 +224,13 @@ async function main(): Promise<void> {
   try {
     await server.connect(transport);
     process.stderr.write("LM Studio MCP Server connected successfully\n");
-  } catch (error) {
-    process.stderr.write(`Failed to start server: ${error}\n`);
+  } catch (error: unknown) {
+    process.stderr.write(`Failed to start server: ${error instanceof Error ? error.message : String(error)}\n`);
     process.exit(1);
   }
 }
 
-// Start the server when run directly
-main().catch((error) => {
-  process.stderr.write(`Server error: ${error}\n`);
+main().catch((error: unknown) => {
+  process.stderr.write(`Server error: ${error instanceof Error ? error.message : String(error)}\n`);
   process.exit(1);
 });
