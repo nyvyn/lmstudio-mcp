@@ -53,35 +53,6 @@ server.registerTool("echo", {
   }]
 }));
 
-server.registerTool("lmstudio_health_check", {
-  title: "LM Studio Health Check",
-  description: "Check if LM Studio API is running and accessible",
-  inputSchema: {}
-}, async () => {
-  // Get base URL for display
-  const args = process.argv.slice(2);
-  const baseUrlIndex = args.findIndex(arg => arg === '--base-url');
-  const baseUrlFromArgs = baseUrlIndex !== -1 && baseUrlIndex + 1 < args.length ? args[baseUrlIndex + 1] : null;
-  const baseUrl = baseUrlFromArgs || process.env.LM_STUDIO_URL || "http://localhost:1234";
-  
-  try {
-    const response = await makeRequest("/models");
-    return {
-      content: [{
-        type: "text",
-        text: `✅ LM Studio API is running and accessible\nBase URL: ${baseUrl}/v1\nResponse: ${JSON.stringify(response, null, 2)}`
-      }]
-    };
-  } catch (error) {
-    return {
-      content: [{
-        type: "text",
-        text: `❌ LM Studio API is not accessible\nBase URL: ${baseUrl}/v1\nError: ${error instanceof Error ? error.message : String(error)}`
-      }]
-    };
-  }
-});
-
 server.registerTool("lmstudio_list_models", {
   title: "List LM Studio Models",
   description: "Get a list of all available models in LM Studio",
